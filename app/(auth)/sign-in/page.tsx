@@ -1,73 +1,45 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import InputField from "@/components/forms/InputField";
-import FooterLink from "@/components/forms/FooterLink";
-
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import FooterLink from "@/components/forms/FooterLink";
+import ConnectButton from "@/components/ConnectButton";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 const SignIn = () => {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SignInFormData>({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-    mode: "onBlur",
-  });
 
-  const onSubmit = async (data: SignInFormData) => {
-    try {
-    } catch (e) {}
-  };
+  const { address, isConnected, isConnecting } = useAppKitAccount();
+
+  useEffect(() => {
+    if (isConnected && address) {
+      router.replace("/home");
+    }
+  }, [isConnected, address, router]);
+
+  if (isConnecting) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10">
+        <p>Connecting wallet...</p>
+      </div>
+    );
+  }
 
   return (
     <>
-      <h1 className="form-title">Welcome back</h1>
+      <h1 className="form-title">Welcome</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <InputField
-          name="email"
-          label="Email"
-          placeholder="contact@jsmastery.com"
-          register={register}
-          error={errors.email}
-          validation={{
-            required: "Email is required",
-            pattern: /^\w+@\w+\.\w+$/,
-          }}
-        />
-
-        <InputField
-          name="password"
-          label="Password"
-          placeholder="Enter your password"
-          type="password"
-          register={register}
-          error={errors.password}
-          validation={{ required: "Password is required", minLength: 8 }}
-        />
-
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="orange-btn w-full mt-5"
-        >
-          {isSubmitting ? "Signing In" : "Sign In"}
-        </Button>
+      <div className="space-y-5">
+        <ConnectButton />
 
         <FooterLink
           text="Don't have an account?"
           linkText="Create an account"
           href="/sign-up"
         />
-      </form>
+      </div>
     </>
   );
 };
+
 export default SignIn;
