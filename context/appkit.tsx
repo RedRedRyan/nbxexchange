@@ -5,10 +5,10 @@ import { EthersAdapter } from "@reown/appkit-adapter-ethers";
 import { mainnet, arbitrum } from "@reown/appkit/networks";
 import { type ReactNode } from "react";
 
-const projectId = process.env.PROJECT_ID!
+const projectId = process.env.NEXT_PUBLIC_PROJECT_ID!
 
 const metadata = {
-  name: "My Website",
+  name:"NBX",
   description: "My Website description",
   url: "https://mywebsite.com",
   icons: ["https://avatars.mywebsite.com/"],
