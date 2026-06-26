@@ -11,6 +11,7 @@
   "dependencies": {
     "@reown/appkit": "^1.8.21",
     "@reown/appkit-adapter-ethers": "^1.8.21",
+    "@reown/appkit-wallet-button": "^1.8.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

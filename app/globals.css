@@ -142,7 +142,26 @@
   }
 }
 
+@utility flex-center {
+  @apply flex justify-center items-center;
+}
+
+@utility col-center {
+  @apply flex flex-col justify-center items-center;
+}
+
 @layer utilities {
+
+  #dash{
+    @apply min-h-screen;
+
+    .dash-grid{
+      @apply grid grid-cols-2 lg:grid-cols-4 gap-4
+
+    }
+
+  }
+
   .container {
     @apply mx-auto max-w-screen-2xl px-4 md:px-6 lg:px-8;
   }

@@ -2,14 +2,14 @@
 
 import { createAppKit } from "@reown/appkit/react";
 import { EthersAdapter } from "@reown/appkit-adapter-ethers";
-import { mainnet, arbitrum } from "@reown/appkit/networks";
+import {   hedera} from "@reown/appkit/networks";
 import { type ReactNode } from "react";
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID!
 
 const metadata = {
-  name:"NBX",
-  description: "My Website description",
+  name: "NBX",
+  description: "Tokenizing equities and bonds",
   url: "https://mywebsite.com",
   icons: ["https://avatars.mywebsite.com/"],
 };
@@ -17,7 +17,7 @@ const metadata = {
 createAppKit({
   adapters: [new EthersAdapter()],
   metadata,
-  networks: [mainnet, arbitrum],
+  networks: [ hedera],
   projectId,
   features: {
     analytics: true,

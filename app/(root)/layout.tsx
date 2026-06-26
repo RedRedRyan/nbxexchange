@@ -1,7 +1,23 @@
-import React from 'react'
+"use client"
+
+import React, {useEffect} from 'react'
 import Header from '@/components/Header'
+import {useAppKitAccount} from "@reown/appkit/react";
+import {router} from "next/client";
+import {redirect, useRouter} from "next/navigation";
+
 
 const layout = ({children}:{children : React.ReactNode}) => {
+
+
+  const { address, isConnected, isConnecting } = useAppKitAccount();
+
+  useEffect(() => {
+    if (!isConnected) {
+      redirect("/sign-in");
+    }
+  }, [isConnected, router]);
+
   return (
 <main className='min-h-screen text-gray-400'>
     <Header/>

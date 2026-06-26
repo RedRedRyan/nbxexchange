@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import NavItems from "./NavItems";
+import {AppKitAccountButton} from "@reown/appkit/react";
 
 const UserDropdown = () => {
   const router = useRouter();
@@ -69,6 +70,11 @@ const UserDropdown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-600" />
+        <DropdownMenuItem>
+
+
+          <AppKitAccountButton/>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleSignOut}
           className="text-gray-100 text-md font-meddium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer"

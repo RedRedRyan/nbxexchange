@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import FooterLink from "@/components/forms/FooterLink";
 import ConnectButton from "@/components/ConnectButton";
-import { useAppKitAccount } from "@reown/appkit/react";
+import {AppKitConnectButton, useAppKitAccount} from "@reown/appkit/react";
+import { AppKitWalletButton} from "@reown/appkit-wallet-button";
+
 
 const SignIn = () => {
   const router = useRouter();
@@ -13,7 +15,7 @@ const SignIn = () => {
 
   useEffect(() => {
     if (isConnected && address) {
-      router.replace("/home");
+      router.replace("/");
     }
   }, [isConnected, address, router]);
 
@@ -30,7 +32,13 @@ const SignIn = () => {
       <h1 className="form-title">Welcome</h1>
 
       <div className="space-y-5">
-        <ConnectButton />
+
+        <div className={"flex flex-col"}>
+          <AppKitConnectButton />
+
+        </div>
+
+
 
         <FooterLink
           text="Don't have an account?"
