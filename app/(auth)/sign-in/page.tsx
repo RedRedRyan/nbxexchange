@@ -3,10 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import FooterLink from "@/components/forms/FooterLink";
-import ConnectButton from "@/components/ConnectButton";
-import {AppKitConnectButton, useAppKitAccount} from "@reown/appkit/react";
-import { AppKitWalletButton} from "@reown/appkit-wallet-button";
-
+import  {useAppKitAccount} from "@/context/appkit";
+import {AppKitAccountButton, AppKitButton, AppKitConnectButton} from '@reown/appkit/react'
+import {AppKitWalletButton} from "@reown/appkit-wallet-button/react";
 
 const SignIn = () => {
   const router = useRouter();
@@ -34,8 +33,8 @@ const SignIn = () => {
       <div className="space-y-5">
 
         <div className={"flex flex-col"}>
-          <AppKitConnectButton />
-
+         <AppKitAccountButton/>
+    <h1>Hello</h1>
         </div>
 
 

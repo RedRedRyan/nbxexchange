@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import TradingViewWidget from "@/components/TradingViewWidget";
@@ -7,6 +9,8 @@ import {
   MARKET_OVERVIEW_WIDGET_CONFIG,
   TOP_STORIES_WIDGET_CONFIG,
 } from "@/lib/constants";
+import {AppKitConnectButton} from "@reown/appkit/react";
+import Image from "next/image";
 
 const Home = () => {
   const scriptUrl =
@@ -14,16 +18,48 @@ const Home = () => {
   return (
       <div className="flex min-h-screen home-wrapper">
         <section className="grid w-full gap-8 home-section">
-          <div className="md:col-span-1 xl:col-span-1">
+    <div className={"md-col-span lg:col-span-2 rounded-3xl   "}>
+
+    <div className={"flex flex-row justify-between"}>
+        <Image className="absolute object-cover -z-10 opacity-25"
+               src="/assets/images/worldmap.svg"
+               width={800}
+               height={800}
+                />
+      <h1 className={"font-bold text-6xl md:text-[10vw] text-white "}>Own <br/> The <br/>  Future</h1>
+
+      <div className={"flex flex-col justify-between"}>
+        <div className={"text-right font-mono text-sm"}>
+  <h1 > Built on <a className={"text-orange"} href={"https://hedera.com/"}>hedera</a></h1>
+
+
+
+      </div>
+        <div>
+
+          <Button
+              className={"bg-orange lg:w-48 w-40 h-12 text-md z-10"}
+
+          >
+            Connect Wallet
+          </Button>
+        </div>
+
+      </div>
+    </div>
+
+    </div>
+
+          <div className="md:col-span-1 lg:col-span-1">
             <TradingViewWidget
-                title="Market Overview"
+                // title="Market Overview"
                 scriptUrl={`${scriptUrl}market-overview.js`}
                 config={MARKET_OVERVIEW_WIDGET_CONFIG}
                 className="custom-chart"
                 height={600}
             />
           </div>
-          <div className="md-col-span xl:col-span-2">
+          <div className="md-col-span lg:col-span-2">
             <TradingViewWidget
                 title="Stock Heatmap"
                 scriptUrl={`${scriptUrl}stock-heatmap.js`}
@@ -33,14 +69,14 @@ const Home = () => {
           </div>
         </section>
         <section className="grid w-full gap-8 home-section">
-          <div className="h-full md:col-span-1 xl:col-span-1">
+          <div className="h-full md:col-span-1 lg:col-span-1">
             <TradingViewWidget
                 scriptUrl={`${scriptUrl}timeline.js`}
                 config={TOP_STORIES_WIDGET_CONFIG}
                 height={600}
             />
           </div>
-          <div className="h-full md:col-span-1 xl:col-span-2">
+          <div className="h-full md:col-span-1 lg:col-span-2">
             <TradingViewWidget
                 scriptUrl={`${scriptUrl}market-quotes.js`}
                 config={MARKET_DATA_WIDGET_CONFIG}

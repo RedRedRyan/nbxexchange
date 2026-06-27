@@ -10,13 +10,9 @@ import {redirect, useRouter} from "next/navigation";
 const layout = ({children}:{children : React.ReactNode}) => {
 
 
-  const { address, isConnected, isConnecting } = useAppKitAccount();
+  const { isConnected  } = useAppKitAccount();
 
-  useEffect(() => {
-    if (!isConnected) {
-      redirect("/sign-in");
-    }
-  }, [isConnected, router]);
+
 
   return (
 <main className='min-h-screen text-gray-400'>

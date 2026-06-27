@@ -133,6 +133,17 @@
   --color-orange: #fb4f1f;
 }
 
+
+
+
+@utility world-map {
+  background: url("/assets/images/worldmap.svg") no-repeat center;
+  background-size: cover;
+
+  opacity: 0.15;
+
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -156,7 +167,11 @@
     @apply min-h-screen;
 
     .dash-grid{
-      @apply grid grid-cols-2 lg:grid-cols-4 gap-4
+      @apply grid grid-cols-1 lg:grid-cols-3 gap-4;
+
+      > div {
+        @apply rounded-3xl overflow-hidden h-64 relative;
+      }
 
     }
 
@@ -172,7 +187,7 @@
     @apply text-gray-400 flex-col gap-4 md:gap-10 items-center sm:items-start;
   }
   .home-section {
-    @apply w-full gap-8 grid-cols-1 md:grid-cols-2 xl:grid-cols-3;
+    @apply w-full gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
   }
   .header {
     @apply z-50 w-full h-[70px] bg-gray-800;
@@ -470,7 +485,7 @@
 }
 
 .custom-chart.tradingview-widget-container iframe {
-  border: 1px solid #30333a;
+
   border-radius: 8px !important;
   overflow: hidden !important;
 }

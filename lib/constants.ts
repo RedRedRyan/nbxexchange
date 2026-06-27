@@ -328,7 +328,7 @@ export const WATCHLIST_TABLE_HEADER = [
   "Action",
 ];
 export const USDC = {
-  tokenId: "0.0.7228867",
+  tokenId: "0.0.456858",
   symbol: "USDC",
   decimals: 6, 
   icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Circle_USDC_Logo.svg/250px-Circle_USDC_Logo.svg.png", // KES stablecoin icon

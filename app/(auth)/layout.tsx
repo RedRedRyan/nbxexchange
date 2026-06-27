@@ -5,8 +5,8 @@ import Image from "next/image";
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="auth-layout">
-      <section className="auth-left-section scrollbar-hide-default">
+    <main>
+      <section className="min-h-screen">
         <Link href="/" className="auth-logo">
           <Image
             src="/assets/icons/logo.svg"

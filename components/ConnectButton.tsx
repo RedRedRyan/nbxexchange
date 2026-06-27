@@ -1,5 +1,8 @@
-import { AppKitButton } from '@reown/appkit/react'
+import React from 'react'
 
-export default function ConnectButton() {
-  return <AppKitButton />
+const ConnectButton = () => {
+    return (
+        <div>ConnectButton</div>
+    )
 }
+export default ConnectButton

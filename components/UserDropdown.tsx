@@ -21,10 +21,11 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import NavItems from "./NavItems";
 import {AppKitAccountButton} from "@reown/appkit/react";
+import { useAppKitAccount } from "@/context/appkit";
 
 const UserDropdown = () => {
   const router = useRouter();
-
+  const { address } = useAppKitAccount();
   const handleSignOut = async () => {
     router.push("/sign-in");
   };
@@ -51,7 +52,7 @@ const UserDropdown = () => {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40 text-gray-400">
+      <DropdownMenuContent className="w-48 text-gray-400">
         <DropdownMenuLabel>
           <div className="flex relative items-center gap-3 py-2">
             <Avatar className="h-10 w-10">
