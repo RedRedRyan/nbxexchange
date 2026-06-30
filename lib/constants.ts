@@ -334,3 +334,30 @@ export const USDC = {
   icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Circle_USDC_Logo.svg/250px-Circle_USDC_Logo.svg.png", // KES stablecoin icon
   network: "mainnet",
 };
+
+export const NBXFEATURES = [
+  {
+    title: "Spot Trading",
+    description: "Buy and sell equities and bonds instantly at current market prices.",
+    icon: "/assets/icons/spot.png",
+    link: "/markets/spot"
+  },
+  {
+    title: "Futures Trading",
+    description: "Trade futures contracts to hedge risks or speculate on price movements.",
+    icon: "/assets/icons/futures.png",
+    link: "/markets/futures"
+  },
+  {
+    title: "Earn",
+    description: "Earn interest on your crypto assets with flexible and fixed options.",
+    icon: "/assets/icons/stake.png",
+    link: "/earn"
+  },
+  {
+    title: "Wallet",
+    description: "Securely store, send, and receive your digital assets with our integrated wallet.",
+    icon: "/assets/icons/piggybank.png",
+    link: "/wallet"
+  }
+]

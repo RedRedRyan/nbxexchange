@@ -1,52 +1,90 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { Magic } from "magic-sdk";
+import { Button } from "@/components/ui/button";
+import InputField from "@/components/forms/InputField";
 import FooterLink from "@/components/forms/FooterLink";
-import  {useAppKitAccount} from "@/context/appkit";
-import {AppKitAccountButton, AppKitButton, AppKitConnectButton} from '@reown/appkit/react'
-import {AppKitWalletButton} from "@reown/appkit-wallet-button/react";
+import { useRouter } from "next/navigation";
+import {HederaExtension} from "@magic-ext/hedera";
+
+type SignInFormData = {
+    email: string;
+};
+
+const magic =
+    typeof window !== "undefined"
+        ? new Magic("pk_live_0018166BD8A4181E", {
+            extensions: [new HederaExtension({ network: "testnet" })],
+        })
+        : null;
 
 const SignIn = () => {
-  const router = useRouter();
+    const router = useRouter();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<SignInFormData>({
+        defaultValues: { email: "" },
+        mode: "onBlur",
+    });
 
-  const { address, isConnected, isConnecting } = useAppKitAccount();
+    const onSubmit = async (data: SignInFormData) => {
+        try {
+            // Magic sends a one-time link / OTP to the user's email.
+            // The modal/OTP UI is handled automatically by the Magic SDK.
+            const didToken = await magic!.auth.loginWithEmailOTP({
+                email: data.email,
+            });
 
-  useEffect(() => {
-    if (isConnected && address) {
-      router.replace("/");
-    }
-  }, [isConnected, address, router]);
+            // didToken is a Decentralised ID token you can send to your
+            // backend to verify the session if needed.
+            console.log("DID Token:", didToken);
 
-  if (isConnecting) {
+            // Optionally fetch the logged-in user's info
+            const userMetadata = await magic!.user.getInfo();
+            console.log("User:", userMetadata);
+
+            router.push("/dashboard");
+        } catch (e) {
+            console.error("Magic login error:", e);
+        }
+    };
+
     return (
-      <div className="flex flex-col items-center justify-center py-10">
-        <p>Connecting wallet...</p>
-      </div>
+        <>
+            <h1 className="form-title">Welcome back</h1>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <InputField
+                    name="email"
+                    label="Email"
+                    placeholder="contact@jsmastery.com"
+                    register={register}
+                    error={errors.email}
+                    validation={{
+                        required: "Email is required",
+                        pattern: /^\w+@\w+\.\w+$/,
+                    }}
+                />
+
+                <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="orange-btn w-full mt-5"
+                >
+                    {isSubmitting ? "Sending link…" : "Sign In"}
+                </Button>
+
+                <FooterLink
+                    text="Don't have an account?"
+                    linkText="Create an account"
+                    href="/sign-up"
+                />
+            </form>
+        </>
     );
-  }
-
-  return (
-    <>
-      <h1 className="form-title">Welcome</h1>
-
-      <div className="space-y-5">
-
-        <div className={"flex flex-col"}>
-         <AppKitAccountButton/>
-    <h1>Hello</h1>
-        </div>
-
-
-
-        <FooterLink
-          text="Don't have an account?"
-          linkText="Create an account"
-          href="/sign-up"
-        />
-      </div>
-    </>
-  );
 };
 
 export default SignIn;

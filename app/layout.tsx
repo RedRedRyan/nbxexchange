@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppKit } from "../context/appkit";
+import gsap from "gsap";
+import ScrambleTextPlugin  from 'gsap'
 
+
+gsap.registerPlugin(ScrambleTextPlugin)
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -30,7 +33,7 @@ export default function RootLayout({
       
       
     >
-      <body className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>        <AppKit>{children}</AppKit> </body>
+      <body className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>        {children} </body>
     </html>
   );
 }

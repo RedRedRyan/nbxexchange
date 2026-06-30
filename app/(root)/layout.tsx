@@ -2,7 +2,7 @@
 
 import React, {useEffect} from 'react'
 import Header from '@/components/Header'
-import {useAppKitAccount} from "@reown/appkit/react";
+
 import {router} from "next/client";
 import {redirect, useRouter} from "next/navigation";
 
@@ -10,7 +10,7 @@ import {redirect, useRouter} from "next/navigation";
 const layout = ({children}:{children : React.ReactNode}) => {
 
 
-  const { isConnected  } = useAppKitAccount();
+
 
 
 

@@ -1,56 +1,88 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAppKitAccount } from "@/context/appkit";
 import { getBalance } from "@/lib/balanceChecker";
 import { USDC } from "@/lib/constants";
+import useMagicAuthStore, {magic} from "@/lib/user.magic";
+import {Button} from "@/components/ui/button";
+import SendModal from "@/components/SendModal";
+
+
+
+
 
 const Page = () => {
-    const { account, address, isConnected } = useAppKitAccount();
-    const [balance, setBalance] = useState<number | null>(null);
-    const tokenID = USDC.tokenId;
+    const {
+        isConnected,
+        address,
+        balance,
+        userInfo,
+        fetchAuthenticatedUser,
+        fetchBalance,
+    } = useMagicAuthStore();
 
-    // With HederaAdapter + native namespace, address is "0.0.XXXXX" directly
-    // With HederaAdapter + eip155 namespace, address is still "0x..." EVM
-    // account.address is the one that carries the native Hedera ID when using hederaNamespace
-    const accountId = address; // already "0.0.XXXXX" if connected via native adapter
 
+    const [sendOpen, setSendOpen] = useState(false);
+    const email = userInfo?.email ?? "—";
+    const initials = email !== "—" ? email.slice(0, 2).toUpperCase() : "?";
+
+    // Truncate EVM address for display: 0x1234...abcd
+    const shortAddress = address
+        ? `${address.slice(0, 6)}...${address.slice(-4)}`
+        : "—";
+
+
+
+    // Rehydrate session on mount
     useEffect(() => {
-        if (!accountId || !isConnected) return;
-        const fetchBalance = async () => {
-            try {
-                const result = await getBalance(tokenID, accountId);
-                setBalance(result ?? 0);
-            } catch (err) {
-                console.error("Error fetching balance:", err);
-            }
-        };
-        fetchBalance();
-    }, [tokenID, accountId, isConnected]);
+        fetchAuthenticatedUser();
+    }, []);
 
     return (
         <section id="dash">
+            {/* ── Avatar + identity ── */}
             <div className="flex-center flex-col mb-6">
                 <Avatar className="h-24 w-24">
                     <AvatarImage src="https://github.com/shadcn.png" />
                     <AvatarFallback className="bg-orange text-black text-sm font-bold">
-                        {accountId?.split(".")[2]?.[0] ?? "?"}
+                        {initials}
                     </AvatarFallback>
                 </Avatar>
-                <h1 className="mt-5">{accountId ?? "Not connected"}</h1>
-                <h1>Profile</h1>
+
+                <h1 className="mt-5 font-mono text-sm">{email}</h1>
+                <p className="font-mono text-xs opacity-60">{shortAddress}</p>
+
             </div>
 
+            {/* ── Dashboard grid ── */}
             <div className="dash-grid">
-                <div className="bg-orange ">
-                    <p>Balance: {balance ?? "—"}</p>
+                {/* HBAR balance */}
+                <div className="bg-orange p-4 rounded-xl">
+                    <p className="text-xs uppercase opacity-70 mb-1">HBAR Balance</p>
+                    <p className="text-2xl font-bold">{balance}</p>
                 </div>
-                <div className="bg-blue-500 ">
 
+                {/* Full address */}
+                <div className="bg-blue-500 p-4 rounded-xl">
+                    <p className="text-xs uppercase opacity-70 mb-1">Wallet Address</p>
+                    <p className="text-sm font-mono break-all">{address || "—"}</p>
+                    <p className="text-xs uppercase opacity-70 mb-1">Hedera Account</p>
+                    <p className="text-sm font-mono">
+                        {userInfo?.wallets.hederaAccountId || "—"}
+                    </p>
                 </div>
-                <div className="bg-green-500">!</div>
 
+                {/* Hedera account ID */}
+                <div className="bg-green-500 p-4 rounded-xl">
+
+
+                    <Button
+
+                        onClick={() => setSendOpen(true)}
+                    >Send</Button>
+                    <SendModal isOpen={sendOpen} onClose={() => setSendOpen(false)} />
+                </div>
             </div>
         </section>
     );
