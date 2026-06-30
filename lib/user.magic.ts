@@ -14,11 +14,8 @@ export const magic =
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type WalletInfo = {
-    /** Native Hedera account ID (0.0.XXXXX) from the Hedera extension */
     hederaAccountId: string;
-    /** EVM-compatible public address (0x…) – from the ethereum wallet entry */
     evmAddress: string;
-    /** Hedera testnet address from wallets.hedera.subAccounts */
     hederaTestnetAddress: string;
 };
 
@@ -32,10 +29,8 @@ export type UserInfo = {
 
 type AuthState = {
     isConnected: boolean;
-    /** Primary display address – EVM address returned by connectWithUI / getInfo */
     address: string;
     isLoading: boolean;
-    /** HBAR balance as a human-readable string, e.g. "12.5 HBAR" */
     balance: string;
     userInfo: UserInfo | null;
 
@@ -47,14 +42,11 @@ type AuthState = {
     disconnectWallet: () => Promise<void>;
     fetchAuthenticatedUser: () => Promise<void>;
     fetchBalance: () => Promise<void>;
+    copyAddress: (which?: "evm" | "hedera") => Promise<boolean>;
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/**
- * Fetch HBAR balance for a Hedera testnet account via Mirror Node REST API.
- * Returns a formatted string like "12.5 HBAR" or "–" on failure.
- */
 async function fetchHbarBalance(accountId: string): Promise<string> {
     if (!accountId) return "–";
     try {
@@ -63,7 +55,6 @@ async function fetchHbarBalance(accountId: string): Promise<string> {
         );
         if (!res.ok) return "–";
         const data = await res.json();
-        // balance.balance is in tinybars (1 HBAR = 100,000,000 tinybars)
         const tinybars: number = data?.balance?.balance ?? 0;
         const hbar = (tinybars / 1e8).toFixed(4);
         return `${hbar} HBAR`;
@@ -72,22 +63,15 @@ async function fetchHbarBalance(accountId: string): Promise<string> {
     }
 }
 
-/**
- * Parse the SDK v30+ wallets object into our WalletInfo shape.
- * Falls back gracefully when fields are missing (older SDK / network quirks).
- */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseWallets(wallets: any): WalletInfo {
-    const evmAddress: string =
-        wallets?.ethereum?.publicAddress ?? "";
+    const evmAddress: string = wallets?.ethereum?.publicAddress ?? "";
 
-    // Hedera testnet address lives in subAccounts
     const hederaSubAccounts: { name: string; publicAddress: string }[] =
         wallets?.hedera?.subAccounts ?? [];
     const testnetEntry = hederaSubAccounts.find((a) => a.name === "testnet");
     const hederaTestnetAddress = testnetEntry?.publicAddress ?? "";
 
-    // Native Hedera account ID – mainnet slot (may be null on testnet-only)
     const hederaAccountId: string =
         wallets?.hedera?.publicAddress ?? hederaTestnetAddress;
 
@@ -107,17 +91,14 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
     setAddress: (address) => set({ address }),
     setLoading: (loading) => set({ isLoading: loading }),
 
-    // ── Connect ────────────────────────────────────────────────────────────
     connectWallet: async () => {
         set({ isLoading: true });
         try {
-            // SDK v30+: connectWithUI returns String[] — first element is the EVM address
             const accounts = await magic!.wallet.connectWithUI();
             const evmAddress = Array.isArray(accounts) ? accounts[0] ?? "" : "";
 
             set({ isConnected: true, address: evmAddress });
 
-            // Hydrate full user info + balance after connecting
             await get().fetchAuthenticatedUser();
         } catch (e) {
             console.error("connectWallet error", e);
@@ -127,7 +108,6 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
         }
     },
 
-    // ── Disconnect ─────────────────────────────────────────────────────────
     disconnectWallet: async () => {
         set({ isLoading: true });
         try {
@@ -140,7 +120,6 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
         }
     },
 
-    // ── Fetch authenticated user (session restore on mount) ────────────────
     fetchAuthenticatedUser: async () => {
         set({ isLoading: true });
         try {
@@ -151,9 +130,7 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
                 return;
             }
 
-            // SDK v30+: publicAddress is gone from the top level — use wallets object
             const raw = await magic!.user.getInfo();
-
             const wallets = parseWallets(raw.wallets);
 
             const userInfo: UserInfo = {
@@ -164,12 +141,10 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
                 wallets,
             };
 
-            // Prefer EVM address as the primary display address
             const address = wallets.evmAddress || wallets.hederaAccountId;
 
             set({ isConnected: true, address, userInfo });
 
-            // Fetch HBAR balance in the background
             await get().fetchBalance();
         } catch (e) {
             console.error("fetchAuthenticatedUser error", e);
@@ -179,7 +154,6 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
         }
     },
 
-    // ── Fetch balance ──────────────────────────────────────────────────────
     fetchBalance: async () => {
         const { userInfo } = get();
         const accountId =
@@ -193,6 +167,30 @@ const useMagicAuthStore = create<AuthState>((set, get) => ({
 
         const balance = await fetchHbarBalance(accountId);
         set({ balance });
+    },
+
+    // ── Copy address ───────────────────────────────────────────────────────
+    copyAddress: async (which = "evm") => {
+        const { userInfo, address } = get();
+
+        const target =
+            which === "hedera"
+                ? userInfo?.wallets.hederaAccountId ||
+                userInfo?.wallets.hederaTestnetAddress
+                : address || userInfo?.wallets.evmAddress;
+
+        if (!target) {
+            console.warn("copyAddress: no address available to copy");
+            return false;
+        }
+
+        try {
+            await navigator.clipboard.writeText(target);
+            return true;
+        } catch (e) {
+            console.error("copyAddress error", e);
+            return false;
+        }
     },
 }));
 

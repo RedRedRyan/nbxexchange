@@ -37,7 +37,7 @@ const Home = () => {
                         scrambleText: {
                             text: NBXFEATURES[index].description,
                             chars: "upperAndLowerCase",
-                            revealDelay: 0.5,
+                            revealDelay: 1.5,
                         },
                     });
                 });
@@ -102,6 +102,131 @@ const Home = () => {
                         scriptUrl={`${scriptUrl}market-overview.js`}
                         config={MARKET_OVERVIEW_WIDGET_CONFIG}
                         className="custom-chart"
+                        height={600}
+                    />
+                </div>
+            </section>
+            <section className="grid w-full heat-section">
+
+                <div className="md-col-span lg:col-span-1">
+                    <h1 className={"text-orange text-xl font-mono"}>Fixed Investments</h1>
+
+                    <div className={"grid grid-cols-2 object-cover gap-3"}>
+                        {NBXFEATURES.map((feature, index) => (
+                            <div key={index} className="col-span-1">
+                                <div className="relative p-6 backdrop-brightness-50 rounded-lg h-full hover:bg-orange flex flex-col items-center text-center group text-orange hover:border-2 border-orange">
+                                    <div className="feature-icon mb-4">
+                                        <img
+                                            src={feature.icon || "/placeholder.svg"}
+                                            alt={feature.title}
+                                            className="w-24 h-24 "
+                                        />
+                                    </div>
+                                    <h3 className="text-sm lg:text-xl font-bold mb-2">
+                                        {feature.title}
+                                    </h3>
+
+                                    {/* Hidden description overlay */}
+                                    <div
+                                        className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                        id={`desc-${index}`}
+                                    >
+                                        {feature.description}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+
+                    </div>
+                </div>
+                <div className="md-col-span lg:col-span-1">
+                    <TradingViewWidget
+                        scriptUrl={`${scriptUrl}stock-heatmap.js`}
+                        config={HEATMAP_WIDGET_CONFIG}
+                        height={600}
+                    />
+                </div>
+                <div className="md-col-span lg:col-span-3">
+
+                </div>
+
+            </section>
+            <section className="grid w-full gap-8 home-section">
+                <div className="h-full md:col-span-1 lg:col-span-1">
+                    <TradingViewWidget
+                        scriptUrl={`${scriptUrl}timeline.js`}
+                        config={TOP_STORIES_WIDGET_CONFIG}
+                        height={600}
+                    />
+                </div>
+                <div className="h-full md:col-span-1 lg:col-span-2">
+                    <TradingViewWidget
+                        scriptUrl={`${scriptUrl}market-quotes.js`}
+                        config={MARKET_DATA_WIDGET_CONFIG}
+                        height={600}
+                    />
+                </div>
+            </section>
+            <section className="grid w-full heat-section">
+
+                <div className="md-col-span lg:col-span-1">
+                    <h1 className={"text-orange text-xl font-mono"}>Fixed Investments</h1>
+
+                    <div className={"grid grid-cols-2 object-cover gap-3"}>
+                        {NBXFEATURES.map((feature, index) => (
+                            <div key={index} className="col-span-1">
+                                <div className="relative p-6 backdrop-brightness-50 rounded-lg h-full bg-orange hover:bg-transparent flex flex-col items-center text-center group">
+                                    <div className="feature-icon mb-4">
+                                        <img
+                                            src={feature.icon || "/placeholder.svg"}
+                                            alt={feature.title}
+                                            className="w-24 h-24"
+                                        />
+                                    </div>
+                                    <h3 className="text-sm lg:text-xl font-bold mb-2 text-primary">
+                                        {feature.title}
+                                    </h3>
+
+                                    {/* Hidden description overlay */}
+                                    <div
+                                        className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                        id={`desc-${index}`}
+                                    >
+                                        {feature.description}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+
+                    </div>
+                </div>
+                <div className="md-col-span lg:col-span-1">
+                    <TradingViewWidget
+                        scriptUrl={`${scriptUrl}stock-heatmap.js`}
+                        config={HEATMAP_WIDGET_CONFIG}
+                        height={600}
+                    />
+                </div>
+                <div className="md-col-span lg:col-span-3">
+
+
+                </div>
+
+            </section>
+            <section className="grid w-full gap-8 home-section">
+                <div className="h-full md:col-span-1 lg:col-span-1">
+                    <TradingViewWidget
+                        scriptUrl={`${scriptUrl}timeline.js`}
+                        config={TOP_STORIES_WIDGET_CONFIG}
+                        height={600}
+                    />
+                </div>
+                <div className="h-full md:col-span-1 lg:col-span-2">
+                    <TradingViewWidget
+                        scriptUrl={`${scriptUrl}market-quotes.js`}
+                        config={MARKET_DATA_WIDGET_CONFIG}
                         height={600}
                     />
                 </div>
