@@ -62,7 +62,7 @@ const Home = () => {
     return (
         <div className="flex min-h-screen home-wrapper">
             <section className="grid w-full gap-8 home-section">
-                <div className="md-col-span lg:col-span-2 rounded-3xl">
+                <div className="md-col-span-1 lg:col-span-2 rounded-3xl">
                     <div className="flex flex-row justify-between">
                         <Image
                             className="absolute object-cover -z-10 opacity-50"

@@ -8,8 +8,9 @@ const Header = () => {
   return (
     <header className='sticky top-0 header'>
         <div className='container header-wrapper'>
-            <Link href="/">
-            <Image src= "/assets/icons/logo.jpg" alt='NBX Logo' width={140} height={32} className='h-8 w-auto cursor-pointer' />
+            <Link href="/" className={"flex flex-row flex-center gap-2"}>
+            <Image src= "/assets/icons/headerlogo.png" alt='NBX Logo' width={140} height={32} className='h-8 w-auto cursor-pointer' />
+                <h1 className={"text-2xl text-orange font-bold "}>NBX</h1>
             </Link>
             <nav className='hidden sm:block'>
                 <NavItems/>
