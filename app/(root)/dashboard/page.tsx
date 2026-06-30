@@ -7,8 +7,9 @@ import { USDC } from "@/lib/constants";
 import useMagicAuthStore, {magic} from "@/lib/user.magic";
 import {Button} from "@/components/ui/button";
 import SendModal from "@/components/SendModal";
-import {Send} from "lucide-react";
+import {IdCard, Mail, Send, History} from "lucide-react";
 import CopyAddressButton from "@/components/CopyAddressButton";
+import HistoryModal from "@/components/HistoryModal";
 
 
 
@@ -24,7 +25,7 @@ const Page = () => {
         fetchBalance,
     } = useMagicAuthStore();
 
-
+    const [historyOpen, setHistoryOpen] = useState(false);
     const [sendOpen, setSendOpen] = useState(false);
     const email = userInfo?.email ?? "—";
     const initials = email !== "—" ? email.slice(0, 2).toUpperCase() : "?";
@@ -43,60 +44,81 @@ const Page = () => {
 
     return (
         <section id="dash">
+
+            <HistoryModal isOpen={historyOpen} onClose={() => setHistoryOpen(false)} />
             {/* ── Dashboard grid ── */}
             <div className="dash-grid">
                 {/* HBAR balance */}
-                <div className="  md-col-span lg:col-span-1 rounded-3xl flex flex-col items-center bg-orange">
-                    <Avatar className=" h-24 w-24">
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback className="bg-orange text-black text-sm font-bold">
-                            {email[0]}
-                        </AvatarFallback>
-                    </Avatar>
+                <div className="  md-col-span lg:col-span-1 rounded-3xl flex flex-col items-center ">
+                    <div className={"   bg-orange w-full  "}>
+                        <div className={"flex flex-row py-2 px-4 gap-5"}>
+                            <Avatar className=" h-12 w-12 ">
+                                <AvatarImage src="https://github.com/shadcn.png" />
+                                <AvatarFallback className="bg-orange text-black text-sm font-bold">
+                                    {email[0]}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className={"flex flex-col text-black "}>
 
-                    <h1 className="mt-5 font-mono text-sm">{email}</h1>
-                    <p className="font-mono text-xs opacity-60">{shortAddress}</p>
-                    <CopyAddressButton/>
+                                    <div className={"flex  flex-row gap-2"}>
+                                        <Mail height={16}/>
+                                        <h1 className=" font-mono text-sm"> {email}</h1>
+                                    </div>
+
+                                <div className={"flex  flex-row gap-2"}>
+                                    <IdCard height={20}/>
+                                    <p>
+
+                                        {userInfo?.wallets.hederaAccountId || "—"}
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                    </div>
+
+                        <p className="text-2xl font-bold flex-center mt-4">{balance}</p>
+                        <p className="font-mono text-xs opacity-60 bottom-0 right-0">{shortAddress}   <CopyAddressButton/></p>
+
+
+
+
+
                 </div>
                 <div className="md-col-span lg:col-span-2 rounded-3xl">
                     <div className=" p-4 rounded-xl flex flex-col items-center">
-                        <p className="text-xs uppercase opacity-70 mb-1">HBAR Balance</p>
-                        <p className="text-2xl font-bold">{balance}</p>
-                        <div className={"flex flex-row gap-2"}>
-                            <div className={"flex flex-col items-center"}>
+
+                        <p className=" font-bold"> QUICK ACTIONS</p>
+                        <div className={"flex flex-row gap-2 mt-5"}>
+                            <div className={"flex flex-row items-center gap-3"}>
                                 <Button
 
                                     onClick={() => setSendOpen(true)}
-                                    className={"hover:bg-orange hover:text-black text-orange border-orange hover:border-3 bg-transparent flex-center font-mono text-lg"}
+                                    className={"qaction-btn"}
 
                                 >
                                     <Send className={""} width={20} height={20} />
                                     <h1 className={'text-sm'}>send</h1>
                                 </Button>
-
-                            </div>
-                            <div className={"flex flex-col items-center"}>
                                 <Button
 
-                                    onClick={() => setSendOpen(true)}
-                                    className={"bg-orange text-black hover:text-orange border-orange hover:border-2 hover:bg-transparent flex-center font-mono text-lg"}
+                                    onClick={() => setHistoryOpen(true)}
+                                    className={"qaction-btn"}
 
                                 >
-                                    <Send className={""} width={20} height={20} />
-                                    <h1 className={'text-sm'}>send</h1>
+                                    <History className={""} width={20} height={20} />
+                                    <h1 className={'text-sm'}>past</h1>
                                 </Button>
 
                             </div>
 
 
-                            <Button
 
-                                onClick={() => setSendOpen(true)}
-                            >Send</Button>
-                            <Button
 
-                                onClick={() => setSendOpen(true)}
-                            >Send</Button>
                         </div>
                     </div>
                 </div>
@@ -108,13 +130,14 @@ const Page = () => {
                             <Button
 
                                 onClick={() => setSendOpen(true)}
-                                className={"border-orange border-2 bg-transparent text-orange"}
+                                className={"qaction-btn"}
 
                             >
                                 <Send className={""} width={20} height={20} />
                                 </Button>
                             <h1 className={'text-sm'}>Send</h1>
                         </div>
+
 
 
                         <Button

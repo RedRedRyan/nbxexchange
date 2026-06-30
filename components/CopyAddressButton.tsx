@@ -23,7 +23,7 @@ export default function CopyAddressButton({ which = "evm", className }: Props) {
     };
 
     return (
-        <Button onClick={handleClick} className={className}>
+        <Button onClick={handleClick} className={'bg-transparent text-orange'} >
             {copied ? (
                 <Check className="w-4 h-4 mr-2" />
             ) : (
