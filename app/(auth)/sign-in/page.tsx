@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import InputField from "@/components/forms/InputField";
 import FooterLink from "@/components/forms/FooterLink";
 import { useRouter } from "next/navigation";
-import useMagicAuthStore, { magic } from "@/lib/user.magic";
+import { magic } from "@/lib/auth.magic";
+import { useAuthStore } from "@/store/auth.store";
+
 
 type SignInFormData = {
     email: string;
@@ -15,7 +17,8 @@ type SignInFormData = {
 
 const SignIn = () => {
     const router = useRouter();
-    const fetchAuthenticatedUser = useMagicAuthStore((s) => s.fetchAuthenticatedUser);
+    const fetchAuthenticatedUser = useAuthStore((s) => s.refreshSession);
+
     const [authError, setAuthError] = useState<string | null>(null);
 
     const {
