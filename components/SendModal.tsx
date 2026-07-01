@@ -5,7 +5,9 @@ import { useForm } from "react-hook-form";
 import InputField from "@/components/forms/InputField";
 import { Button } from "@/components/ui/button";
 import { sendHbar } from "@/lib/wallet.magic";
-import useMagicAuthStore from "@/lib/user.magic";
+import { useUserStore } from "@/store/user.store";
+
+
 
 interface SendFormValues {
     recipientAddress: string;
@@ -44,12 +46,14 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
     const [sending, setSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+
     // Read sender info from store for the "From" display
-    const { userInfo, balance } = useMagicAuthStore();
+    const { userInfo, balance } = useUserStore();
     const senderAddress =
         userInfo?.wallets.hederaAccountId ||
         userInfo?.wallets.hederaTestnetAddress ||
         "—";
+
 
     const {
         register,

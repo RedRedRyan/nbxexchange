@@ -23,19 +23,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import NavItems from "./NavItems";
-import useMagicAuthStore from "@/lib/user.magic";
+import { useAuthStore } from "@/store/auth.store";
+import { useUserStore } from "@/store/user.store";
+
 
 
 
 const UserDropdown = () => {
-  const {
-    isConnected,
-    address,
-    balance,
-    userInfo,
-    fetchAuthenticatedUser,
-    fetchBalance,
-  } = useMagicAuthStore();
+
+
+  const { isConnected, address, connect, disconnect, refreshSession } = useAuthStore();
+
+  const { userInfo, balance, usdcBalance, usdtBalance, fetchUser, fetchBalances } = useUserStore();
+
   const email = userInfo?.email ?? "—";
   const initials = email !== "—" ? email.slice(0, 2).toUpperCase() : "?";
 

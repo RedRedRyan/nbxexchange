@@ -9,9 +9,9 @@ const layout = ({ children }: { children: React.ReactNode }) => {
         <section className="auth-left-section scrollbar-hide-default">
           <Link href="/" className="auth-logo">
             <Image
-                src="/assets/icons/logo.svg"
+                src="/assets/icons/headerlogo.png"
                 alt="Signalist logo"
-                width={140}
+                width={32}
                 height={32}
                 className="h-8 w-auto"
             />

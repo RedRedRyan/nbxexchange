@@ -13,14 +13,19 @@ import {
 import Image from "next/image";
 import gsap from "gsap";
 import { useRouter } from "next/navigation";
-import useMagicAuthStore from "@/lib/auth.magic";
+import { useAuthStore } from "@/store/auth.store";
+import { useUserStore } from "@/store/user.store";
+import {fetchAuthenticatedUser} from "@/lib/auth.magic";
+
 
 const Home = () => {
     const scriptUrl = "https://s3.tradingview.com/external-embedding/embed-widget-";
     const router = useRouter();
 
-    const { isConnected, address, isLoading, connectWallet, fetchAuthenticatedUser } =
-        useMagicAuthStore();
+    const { isConnected, address, connect, disconnect, refreshSession } = useAuthStore();
+
+    const { userInfo, balance, usdcBalance, usdtBalance, fetchUser, fetchBalances } = useUserStore();
+
 
     // Rehydrate auth state on mount
     useEffect(() => {
@@ -49,11 +54,11 @@ const Home = () => {
         if (isConnected) {
             router.push("/trade");
         } else {
-            connectWallet();
+            ;
         }
     };
 
-    const buttonLabel = isLoading
+    const buttonLabel = isConnected
         ? "Loading..."
         : isConnected
             ? "Trade"
@@ -61,17 +66,11 @@ const Home = () => {
 
     return (
         <div className="flex min-h-screen home-wrapper">
-            <section className="grid w-full gap-8 home-section">
-                <div className="md-col-span-1 lg:col-span-2 rounded-3xl">
-                    <div className="flex flex-row justify-between">
-                        <Image
-                            className="absolute object-cover -z-10 opacity-50"
-                            src="/assets/images/worldmap.svg"
-                            width={800}
-                            height={800}
-                            alt="World Map"
-                        />
-                        <h1 className="font-bold text-6xl md:text-[10vw] text-white">
+            <section className="grid gap-8 home-section">
+                <div className="col-span-1  lg:col-span-2 rounded-3xl">
+                    <div className="flex flex-row justify-between relative bg-cover bg-center"
+                         style={{ backgroundImage: "url('/assets/images/worldmap.svg')" }}>
+                        <h1 className="font-bold text-5xl md:text-[10vw] text-white">
                             Own <br /> The <br /> Future
                         </h1>
 
@@ -88,16 +87,17 @@ const Home = () => {
                                 <Button
                                     className="bg-orange lg:w-48 w-40 h-12 text-md z-10"
                                     onClick={handleButtonClick}
-                                    disabled={isLoading}
+                                    disabled={isConnected}
                                 >
                                     {buttonLabel}
                                 </Button>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
-                <div className="md:col-span-1 lg:col-span-1">
+                <div className="col-span-1 lg:col-span-1">
                     <TradingViewWidget
                         scriptUrl={`${scriptUrl}market-overview.js`}
                         config={MARKET_OVERVIEW_WIDGET_CONFIG}
@@ -231,6 +231,7 @@ const Home = () => {
                     />
                 </div>
             </section>
+
         </div>
     );
 };

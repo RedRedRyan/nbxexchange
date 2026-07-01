@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Modal from "react-modal";
 import {
     Table,
     TableBody,
@@ -10,12 +9,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import useMagicAuthStore from "@/lib/user.magic";
+import { useUserStore } from "@/store/user.store";
 
-interface HistoryModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
 interface MirrorTransfer {
     account: string;
@@ -38,29 +33,7 @@ interface TxRow {
     status: string;
 }
 
-const customStyles: Modal.Styles = {
-    content: {
-        top: "50%",
-        left: "50%",
-        right: "auto",
-        bottom: "auto",
-        marginRight: "-50%",
-        transform: "translate(-50%, -50%)",
-        background: "#0a0a0a",
-        border: "1px solid #1f1f1f",
-        borderRadius: "12px",
-        padding: "32px",
-        minWidth: "480px",
-        maxWidth: "640px",
-        color: "#ededed",
-    },
-    overlay: {
-        backgroundColor: "rgba(0, 0, 0, 0.75)",
-        zIndex: 50,
-    },
-};
-
-// Hedera consensus timestamps are "seconds.nanoseconds"
+// Format helpers
 function formatTimestamp(ts: string): string {
     const [seconds] = ts.split(".");
     const date = new Date(Number(seconds) * 1000);
@@ -73,21 +46,14 @@ function formatTimestamp(ts: string): string {
 }
 
 function formatType(name: string): string {
-    // e.g. "CRYPTOTRANSFER" -> "Crypto Transfer"
     return name
         .toLowerCase()
-        .split("")
-        .reduce((acc, char, i) => {
-            if (i === 0) return char.toUpperCase();
-            return acc + char;
-        }, "")
-        .replace(/transfer/i, " Transfer")
-        .trim();
+        .replace("transfer", " Transfer")
+        .replace(/^\w/, (c) => c.toUpperCase());
 }
 
 function summarizeContent(accountId: string, transfers: MirrorTransfer[]): string {
     if (!transfers || transfers.length === 0) return "—";
-
     const mine = transfers.find((t) => t.account === accountId);
     if (!mine) return "—";
 
@@ -102,17 +68,18 @@ function summarizeContent(accountId: string, transfers: MirrorTransfer[]): strin
     return "0 HBAR";
 }
 
-const HistoryModal = ({ isOpen, onClose }: HistoryModalProps) => {
-    const { userInfo } = useMagicAuthStore();
+const HistoryComponent = () => {
+    const { userInfo } = useUserStore();
     const accountId =
         userInfo?.wallets.hederaAccountId || userInfo?.wallets.hederaTestnetAddress;
+
 
     const [transactions, setTransactions] = useState<TxRow[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isOpen || !accountId) return;
+        if (!accountId) return;
 
         const fetchHistory = async () => {
             setLoading(true);
@@ -143,24 +110,12 @@ const HistoryModal = ({ isOpen, onClose }: HistoryModalProps) => {
         };
 
         fetchHistory();
-    }, [isOpen, accountId]);
+    }, [accountId]);
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={onClose}
-            style={customStyles}
-            contentLabel="Transaction History"
-            ariaHideApp={false}
-        >
+        <div className="md:col-span-1 lg:col-span-2 p-6 rounded-xl bg-gray-900 border border-gray-700">
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-white">Transaction History</h2>
-                <button
-                    onClick={onClose}
-                    className="text-gray-400 hover:text-white transition-colors text-sm"
-                >
-                    ✕
-                </button>
             </div>
 
             {!accountId && (
@@ -197,23 +152,17 @@ const HistoryModal = ({ isOpen, onClose }: HistoryModalProps) => {
                     <TableBody>
                         {transactions.map((tx) => (
                             <TableRow key={tx.id}>
-                                <TableCell className="font-mono text-xs">
-                                    {tx.id}
-                                </TableCell>
+                                <TableCell className="font-mono text-xs">{tx.id}</TableCell>
                                 <TableCell>{tx.type}</TableCell>
-                                <TableCell className="text-xs text-gray-400">
-                                    {tx.time}
-                                </TableCell>
-                                <TableCell className="text-right text-xs">
-                                    {tx.content}
-                                </TableCell>
+                                <TableCell className="text-xs text-gray-400">{tx.time}</TableCell>
+                                <TableCell className="text-right text-xs">{tx.content}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             )}
-        </Modal>
+        </div>
     );
 };
 
-export default HistoryModal;
+export default HistoryComponent;

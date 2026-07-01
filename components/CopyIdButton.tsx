@@ -3,18 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
-import { copyAddress } from "@/lib/wallet.actions"; // <-- updated import
+import { copyHederaAccountId } from "@/lib/wallet.actions"; // <-- new import
 
 type Props = {
-    which?: "evm" | "hedera";
     className?: string;
 };
 
-export default function CopyAddressButton({ which = "evm", className }: Props) {
+export default function CopyIdButton({ className }: Props) {
     const [copied, setCopied] = useState(false);
 
     const handleClick = async () => {
-        const ok = await copyAddress(which === "hedera" ? "hedera" : "evm");
+        // call the wallet action to copy Hedera ID
+        const ok = await copyHederaAccountId("hedera-account-id");
         if (ok) {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);

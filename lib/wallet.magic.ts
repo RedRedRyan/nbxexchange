@@ -1,14 +1,19 @@
 import { AccountId, TransferTransaction } from "@hashgraph/sdk";
 import { MagicProvider } from "@/context/MagicProvider";
 import { MagicWallet } from "@/context/MagicWallet";
-import useMagicAuthStore, {magic} from "@/lib/user.magic";
+
+// Magic singleton
+import { magic } from "@/lib/auth.magic";
+
+// Zustand store for user info
+import { useUserStore } from "@/store/user.store";
+
 
 export async function sendHbar(recipientAddress: string, amount: string): Promise<string> {
     if (!magic) throw new Error("Magic not initialized");
 
-    // Pull the sender's Hedera account ID from the Zustand store (SDK v30+ compatible)
-    // Prefer hederaAccountId, fall back to hederaTestnetAddress
-    const { userInfo } = useMagicAuthStore.getState();
+    // Pull the sender's Hedera account ID from the Zustand store
+    const { userInfo } = useUserStore.getState();
     const publicAddress =
         userInfo?.wallets.hederaAccountId ||
         userInfo?.wallets.hederaTestnetAddress;
@@ -31,13 +36,14 @@ export async function sendHbar(recipientAddress: string, amount: string): Promis
     let transaction = await new TransferTransaction()
         .setNodeAccountIds([new AccountId(3)])
         .addHbarTransfer(publicAddress, -1 * Number(amount))   // debit sender
-        .addHbarTransfer(recipientAddress, Number(amount))      // credit recipient
+        .addHbarTransfer(recipientAddress, Number(amount))     // credit recipient
         .freezeWithSigner(magicWallet);
 
     transaction = await transaction.signWithSigner(magicWallet);
     const result = await transaction.executeWithSigner(magicWallet);
     const receipt = await result.getReceiptWithSigner(magicWallet);
 
-    // Returns e.g. "SUCCESS"
-    return receipt.status.toString();
+    return receipt.status.toString(); // e.g. "SUCCESS"
 }
+
+

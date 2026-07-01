@@ -128,7 +128,7 @@
   --color-yellow-500: #e8ba40;
   --color-teal-400: #0fedbe;
   --color-red-500: #ff495b;
-  --color-orange-500: #ff8243;
+  --color-orange-500: #E57255;
   --color-purple-500: #d13bff;
   --color-orange: #fb4f1f;
 }
@@ -164,7 +164,7 @@
 @layer utilities {
 
   #dash{
-    @apply min-h-screen;
+    @apply text-xs font-semibold;
 
     .dash-grid{
       @apply grid grid-cols-1 lg:grid-cols-3 gap-4;
@@ -184,7 +184,7 @@
     @apply h-12 cursor-pointer bg-gradient-to-b from-orange to-orange-500 hover:from-orange-500 hover:to-orange text-gray-950 font-medium text-base rounded-lg shadow-lg disabled:opacity-50;
   }
   .qaction-btn {
-    @apply hover:bg-orange hover:text-black text-orange border-orange hover:border-3 bg-transparent flex-center font-mono text-lg;
+    @apply bg-orange text-black hover:text-orange border-orange hover:border-3 hover:bg-transparent flex-center font-mono text-lg;
   }
   .home-wrapper {
     @apply text-gray-400 flex-col gap-4 md:gap-10 items-center sm:items-start;
@@ -192,11 +192,8 @@
   .home-section {
     @apply w-full gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
   }
-  .heat-section {
-    @apply w-full gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-2;
-  }
   .header {
-    @apply z-50 w-full h-[70px] bg-gray-800;
+    @apply z-50 w-full  bg-gray-800;
   }
   .header-wrapper {
     @apply flex justify-between items-center px-6 py-4 text-gray-500;

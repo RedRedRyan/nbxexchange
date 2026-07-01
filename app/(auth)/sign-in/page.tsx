@@ -1,26 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Magic } from "magic-sdk";
 import { Button } from "@/components/ui/button";
 import InputField from "@/components/forms/InputField";
 import FooterLink from "@/components/forms/FooterLink";
 import { useRouter } from "next/navigation";
-import {HederaExtension} from "@magic-ext/hedera";
+import useMagicAuthStore, { magic } from "@/lib/user.magic";
 
 type SignInFormData = {
     email: string;
 };
 
-const magic =
-    typeof window !== "undefined"
-        ? new Magic("pk_live_0018166BD8A4181E", {
-            extensions: [new HederaExtension({ network: "testnet" })],
-        })
-        : null;
 
 const SignIn = () => {
     const router = useRouter();
+    const fetchAuthenticatedUser = useMagicAuthStore((s) => s.fetchAuthenticatedUser);
+    const [authError, setAuthError] = useState<string | null>(null);
+
     const {
         register,
         handleSubmit,
@@ -31,36 +28,35 @@ const SignIn = () => {
     });
 
     const onSubmit = async (data: SignInFormData) => {
+        setAuthError(null);
+
+        if (!magic) {
+            setAuthError("Wallet SDK isn't ready yet. Please refresh and try again.");
+            return;
+        }
+
         try {
-            // Magic sends a one-time link / OTP to the user's email.
-            // The modal/OTP UI is handled automatically by the Magic SDK.
-            const didToken = await magic!.auth.loginWithEmailOTP({
-                email: data.email,
-            });
+            await magic.auth.loginWithEmailOTP({ email: data.email });
 
-            // didToken is a Decentralised ID token you can send to your
-            // backend to verify the session if needed.
-            console.log("DID Token:", didToken);
-
-            // Optionally fetch the logged-in user's info
-            const userMetadata = await magic!.user.getInfo();
-            console.log("User:", userMetadata);
+            // Populate the Zustand store (userInfo, balance, isConnected)
+            await fetchAuthenticatedUser();
 
             router.push("/dashboard");
         } catch (e) {
             console.error("Magic login error:", e);
+            setAuthError("We couldn't log you in. Check the code and try again.");
         }
     };
 
     return (
         <>
-            <h1 className="form-title">Welcome back</h1>
+            <h1 className="form-title">Welcome</h1>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <InputField
                     name="email"
                     label="Email"
-                    placeholder="contact@jsmastery.com"
+                    placeholder="name@example.com"
                     register={register}
                     error={errors.email}
                     validation={{
@@ -69,19 +65,21 @@ const SignIn = () => {
                     }}
                 />
 
+                {authError && (
+                    <p className="text-sm text-red-500" role="alert">
+                        {authError}
+                    </p>
+                )}
+
                 <Button
                     type="submit"
                     disabled={isSubmitting}
                     className="orange-btn w-full mt-5"
                 >
-                    {isSubmitting ? "Sending link…" : "Sign In"}
+                    {isSubmitting ? "Sending link…" : "Log In / Sign Up"}
                 </Button>
 
-                <FooterLink
-                    text="Don't have an account?"
-                    linkText="Create an account"
-                    href="/sign-up"
-                />
+
             </form>
         </>
     );
