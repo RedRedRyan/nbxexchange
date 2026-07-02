@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { sendHbar, sendToken } from "@/lib/wallet.actions";
-import { getUserTokensWithMetadata, fetchHbarBalance } from "@/lib/auth.magic"; // adjust path if these live elsewhere
+import { getUserTokensWithMetadata, fetchHbarBalance } from "@/lib/user.magic"
 import { useUserStore } from "@/store/user.store";
 
 interface SendFormValues {

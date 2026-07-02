@@ -92,6 +92,7 @@ async function getTokenMetadata(tokenId: string): Promise<TokenMetadata> {
     name: data.name,
     symbol: data.symbol,
     decimals: data.decimals,
+    
   };
 }
 
