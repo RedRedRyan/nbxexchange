@@ -2,20 +2,16 @@
 
 import React, {useEffect, useState} from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getBalance } from "@/lib/balanceChecker";
-import { USDC } from "@/lib/constants";
-
-// for the Zustand store
 import { useAuthStore } from "@/store/auth.store";
 import { useUserStore} from "@/store/user.store";
-// for the Magic instance (only if you need to call Magic methods directly)
-import { magic } from "@/lib/auth.magic";
-
 import {Button} from "@/components/ui/button";
 import SendModal from "@/components/SendModal";
 import {IdCard, Mail, Send, History, ArrowRightLeft, PiggyBank} from "lucide-react";
 import CopyAddressButton from "@/components/CopyAddressButton";
 import HistoryComponent from "@/components/HistoryComponent";
+import { associateToken } from "@/lib/wallet.actions";
+import { KESY_TOKEN } from "@/lib/constants";
+import { formatUnits } from "ethers";
 
 
 
@@ -24,7 +20,7 @@ import HistoryComponent from "@/components/HistoryComponent";
 const Page = () => {
     const { isConnected, address, connect, disconnect, refreshSession } = useAuthStore();
 
-    const { userInfo, balance, usdcBalance, usdtBalance, fetchUser, fetchBalances } = useUserStore();
+    const { userInfo, balance, usdcBalance, usdtBalance, fetchUser, fetchBalances,kesyBalance } = useUserStore();
 
 
 
@@ -36,7 +32,13 @@ const Page = () => {
     const shortAddress = address
         ? `${address.slice(0, 6)}...${address.slice(-4)}`
         : "—";
-
+    useEffect(() => {
+    const load = async () => {
+        await fetchUser();
+        await fetchBalances();
+    };
+    load();
+}, []);
 
 
 
@@ -160,7 +162,7 @@ const Page = () => {
                         <Button
 
                             onClick={() => setSendOpen(true)}
-                        >Send</Button>
+                        >Deposit</Button>
                         <Button
 
                             onClick={() => setSendOpen(true)}
@@ -173,11 +175,12 @@ const Page = () => {
                 {/* Hedera account ID */}
                 <div className="bg-green-500 p-4 rounded-xl">
 
-
+                    <p>{formatUnits(kesyBalance,KESY_TOKEN.decimals)}</p>
                     <Button
 
                         onClick={() => setSendOpen(true)}
-                    >Send</Button>
+                        style={{display:"flex",flexDirection:'row',justifyContent:'center',width:96 }}
+                    ><h1 className={'text-sm'}>Associate</h1><img src={'/assets/icons/kesy.jpg'} style={{width:20,height:20,borderRadius:20}}/></Button>
                     <SendModal isOpen={sendOpen} onClose={() => setSendOpen(false)} />
                 </div>
             </div>

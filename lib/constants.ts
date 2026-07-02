@@ -361,3 +361,11 @@ export const NBXFEATURES = [
     link: "/wallet"
   }
 ]
+export const KESY_TOKEN = {
+  tokenId: "0.0.7228867",
+  symbol: "KESy",
+  name: "Kenyan Shilling Stablecoin",
+  decimals: 6, // Default, will be fetched from mirror node
+  icon: "/assets/kesy.jpg", // KES stablecoin icon
+  network: "testnet",
+};
