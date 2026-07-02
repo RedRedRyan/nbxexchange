@@ -1,17 +1,31 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { useForm } from "react-hook-form";
 import InputField from "@/components/forms/InputField";
 import { Button } from "@/components/ui/button";
-import { sendHbar } from "@/lib/wallet.magic";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { sendHbar, sendToken } from "@/lib/wallet.actions";
+import { getUserTokensWithMetadata, fetchHbarBalance } from "@/lib/auth.magic"; // adjust path if these live elsewhere
 import { useUserStore } from "@/store/user.store";
-
-
 
 interface SendFormValues {
     recipientAddress: string;
     amount: string;
+}
+
+interface AssetOption {
+    id: string; // "HBAR" or token_id
+    label: string; // display symbol/name
+    balanceLabel: string; // formatted balance for the "From" row
+    decimals: number;
+    isHbar: boolean;
 }
 
 interface SendModalProps {
@@ -46,14 +60,15 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
     const [sending, setSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const [assets, setAssets] = useState<AssetOption[]>([]);
+    const [assetsLoading, setAssetsLoading] = useState(false);
+    const [selectedAssetId, setSelectedAssetId] = useState<string>("HBAR");
 
-    // Read sender info from store for the "From" display
-    const { userInfo, balance } = useUserStore();
+    const { userInfo } = useUserStore();
     const senderAddress =
         userInfo?.wallets.hederaAccountId ||
         userInfo?.wallets.hederaTestnetAddress ||
         "—";
-
 
     const {
         register,
@@ -62,10 +77,66 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
         formState: { errors },
     } = useForm<SendFormValues>();
 
+    // Load HBAR balance + all associated tokens whenever the modal opens
+    useEffect(() => {
+        if (!isOpen || !senderAddress || senderAddress === "—") return;
+
+        let cancelled = false;
+        setAssetsLoading(true);
+
+        (async () => {
+            try {
+                const [hbarLabel, tokens] = await Promise.all([
+                    fetchHbarBalance(senderAddress),
+                    getUserTokensWithMetadata(senderAddress).catch(() => []), // no tokens is fine
+                ]);
+
+                if (cancelled) return;
+
+                const hbarOption: AssetOption = {
+                    id: "HBAR",
+                    label: "HBAR",
+                    balanceLabel: hbarLabel || "0 HBAR",
+                    decimals: 8,
+                    isHbar: true,
+                };
+
+                const tokenOptions: AssetOption[] = tokens.map((t) => ({
+                    id: t.token_id,
+                    label: `${t.symbol || t.name || t.token_id}`,
+                    balanceLabel: `${(
+                        Number(t.balance) / 10 ** (t.decimals ?? 0)
+                    ).toString()} ${t.symbol || ""}`.trim(),
+                    decimals: t.decimals ?? 0,
+                    isHbar: false,
+                }));
+
+                setAssets([hbarOption, ...tokenOptions]);
+            } finally {
+                if (!cancelled) setAssetsLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isOpen, senderAddress]);
+
+    const selectedAsset =
+        assets.find((a) => a.id === selectedAssetId) ??
+        assets[0] ?? {
+            id: "HBAR",
+            label: "HBAR",
+            balanceLabel: "–",
+            decimals: 8,
+            isHbar: true,
+        };
+
     const handleClose = () => {
         reset();
         setTxStatus(null);
         setError(null);
+        setSelectedAssetId("HBAR");
         onClose();
     };
 
@@ -73,9 +144,22 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
         setSending(true);
         setError(null);
         setTxStatus(null);
+
         try {
-            const status = await sendHbar(data.recipientAddress, data.amount);
-            setTxStatus(status); // e.g. "SUCCESS"
+            let status: string;
+            if (selectedAsset.isHbar) {
+                status = await sendHbar(data.recipientAddress, data.amount);
+            } else {
+                const rawAmount = Math.round(
+                    Number(data.amount) * 10 ** selectedAsset.decimals
+                );
+                status = await sendToken(
+                    selectedAsset.id,
+                    data.recipientAddress,
+                    rawAmount
+                );
+            }
+            setTxStatus(status);
             reset();
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Transaction failed");
@@ -92,13 +176,13 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
             }}
             onRequestClose={handleClose}
             style={customStyles}
-            contentLabel="Send HBAR"
+            contentLabel="Send"
             ariaHideApp={false}
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 ref={subtitleRef} className="text-xl font-semibold text-white">
-                    Send HBAR
+                    Send {selectedAsset.label}
                 </h2>
                 <button
                     onClick={handleClose}
@@ -113,11 +197,41 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
                 <span className="text-gray-400">From</span>
                 <div className="text-right">
                     <p className="text-white font-mono text-xs">{senderAddress}</p>
-                    <p className="text-gray-400 text-xs">{balance}</p>
+                    <p className="text-gray-400 text-xs">{selectedAsset.balanceLabel}</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                {/* Asset dropdown */}
+                <div className="flex flex-col gap-1">
+                    <label className="text-sm text-gray-400">Asset</label>
+                    <Select
+                        value={selectedAssetId}
+                        onValueChange={setSelectedAssetId}
+                        disabled={assetsLoading || assets.length === 0}
+                    >
+                        <SelectTrigger className="bg-white/5 border border-white/10 text-white text-sm">
+                            <SelectValue
+                                placeholder={assetsLoading ? "Loading assets…" : "Select asset"}
+                            />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#0a0a0a] border border-white/10 text-white">
+                            {assets.map((a) => (
+                                <SelectItem
+                                    key={a.id}
+                                    value={a.id}
+                                    className="text-sm focus:bg-white/10"
+                                >
+                                    {a.label}
+                                    <span className="text-gray-400 ml-2 text-xs">
+                                        {a.balanceLabel}
+                                    </span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
                 <InputField
                     name="recipientAddress"
                     label="Recipient address"
@@ -129,7 +243,7 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
 
                 <InputField
                     name="amount"
-                    label="Amount (HBAR)"
+                    label={`Amount (${selectedAsset.label})`}
                     placeholder="0.0"
                     register={register}
                     validation={{
@@ -161,7 +275,7 @@ const SendModal = ({ isOpen, onClose }: SendModalProps) => {
 
                 <Button
                     type="submit"
-                    disabled={sending}
+                    disabled={sending || assetsLoading}
                     className="w-full bg-[#fb4f1f] hover:bg-[#e04418] text-white font-medium"
                 >
                     {sending ? "Sending…" : "Send"}

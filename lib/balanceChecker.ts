@@ -1,3 +1,6 @@
+import { KESY_TOKEN } from "./constants";
+import { associateToken } from "./wallet.actions";
+
 export interface Token {
   automatic_association: boolean;
   balance: number;
@@ -18,9 +21,9 @@ export interface AccountTokensResponse {
 export const getBalance = async (
   tokenID: string,
   accountID: string
-): Promise<number | undefined> => {
+): Promise<number> => {
   const response = await fetch(
-    `https://mainnet.mirrornode.hedera.com/api/v1/accounts/${accountID}/tokens`
+    `https://testnet.mirrornode.hedera.com/api/v1/accounts/${accountID}/tokens`
   );
 
   if (!response.ok) {
@@ -29,9 +32,15 @@ export const getBalance = async (
 
   const data: AccountTokensResponse = await response.json();
 
-  const token = data.tokens.find(
-    (t) => t.token_id === tokenID
-  );
+  // No tokens associated at all — empty array case
+  if (!data.tokens || data.tokens.length === 0) {
+    await associateToken(KESY_TOKEN.tokenId)
+    return 0
+  }
 
-  return token?.balance;
+  const token = data.tokens.find((t) => t.token_id === tokenID);
+
+  // Tokens exist, but not this specific one 
+  await associateToken(KESY_TOKEN.tokenId)
+  return token?.balance ?? 0;
 };

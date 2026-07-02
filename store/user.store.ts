@@ -1,20 +1,24 @@
 import { create } from "zustand";
 import { getUserInfo, fetchHbarBalance } from "@/lib/user.magic";
+import { getBalance } from "@/lib/balanceChecker";
+import { KESY_TOKEN } from "@/lib/constants";
 
 type UserState = {
     userInfo: any | null;
     balance: string;
     usdcBalance: string;
     usdtBalance: string;
+    kesyBalance: number;
     fetchUser: () => Promise<void>;
     fetchBalances: () => Promise<void>;
 };
 
 export const useUserStore = create<UserState>((set, get) => ({
     userInfo: null,
-    balance: "–",
-    usdcBalance: "–",
-    usdtBalance: "–",
+    balance: "",
+    usdcBalance: "",
+    usdtBalance: "",
+    kesyBalance: 0,//Kenya Shilling Yield a Stable coin proposed by @NHX-finance (on X)
 
     fetchUser: async () => {
         const info = await getUserInfo();
@@ -22,9 +26,16 @@ export const useUserStore = create<UserState>((set, get) => ({
     },
 
     fetchBalances: async () => {
-        const accountId = get().userInfo?.wallets.hederaAccountId;
-        const balance = await fetchHbarBalance(accountId);
-        // Placeholder for USDC/USDT — integrate Hedera Token Service or Mirror Node token balances later
-        set({ balance, usdcBalance: "0 USDC", usdtBalance: "0 USDT" });
+        const accountId = get().userInfo?.wallets?.hederaAccountId;
+        if (!accountId) return;
+
+        const hbarBalance = await fetchHbarBalance(accountId);
+        const kesyBalance = await getBalance(KESY_TOKEN.tokenId, accountId);
+
+        set({
+            balance: hbarBalance,
+            kesyBalance,
+            
+        });
     },
 }));
