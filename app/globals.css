@@ -143,6 +143,17 @@
   opacity: 0.15;
 
 }
+@utility white-grid-background {
+  background-image: linear-gradient(
+          rgba(255, 255, 255, 0.1) 2px,
+          transparent 2px
+  ),
+  linear-gradient(90deg, rgba(255, 255, 255, 0.1) 2px, transparent 2px),
+  linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+}
 
 @layer base {
   * {
@@ -208,7 +219,7 @@
     @apply w-full lg:w-[45%] lg:h-screen px-6 lg:px-16 flex flex-col overflow-y-auto;
   }
   .auth-right-section {
-    @apply w-full max-lg:border-t max-lg:border-gray-600 lg:w-[55%] lg:h-screen bg-gray-800 px-6 py-4 md:p-6 lg:py-12 lg:px-18 flex flex-col justify-start;
+    @apply w-full max-lg:border-t max-lg:border-gray-600 lg:w-[55%] lg:h-screen  bg-orange px-6 py-4 md:p-6 lg:py-12 lg:px-18 flex flex-col justify-start;
   }
   .auth-blockquote {
     @apply text-sm md:text-xl lg:text-2xl font-medium text-gray-400 mb-1 md:mb-6 lg:mb-8;
@@ -217,7 +228,7 @@
     @apply text-xs md:text-lg font-bold text-gray-400 not-italic;
   }
   .auth-dashboard-preview {
-    @apply border-6 border-gray-800 left-0 hidden w-[1024px] h-auto max-w-none lg:block rounded-xl shadow-2xl;
+    @apply  left-0 hidden w-[1024px] h-auto max-w-none lg:block rounded-3xl ;
   }
   .form-title {
     @apply text-4xl font-bold text-gray-400 mb-10;
@@ -226,7 +237,7 @@
     @apply text-sm font-medium text-gray-400;
   }
   .form-input {
-    @apply h-12 px-3 py-3 text-white text-base placeholder:text-gray-500 border-gray-600 bg-gray-800 rounded-lg focus:!border-yellow-500 focus:ring-0;
+    @apply h-12 px-3 py-3 text-white text-base placeholder:text-gray-500 border-gray-600 bg-gray-800 rounded-lg focus:!border-orange focus:ring-0;
   }
   .select-trigger {
     @apply w-full !h-12 px-3 py-3 text-base border-gray-600 bg-gray-800 text-white rounded-lg focus:!border-yellow-500 focus:ring-0;

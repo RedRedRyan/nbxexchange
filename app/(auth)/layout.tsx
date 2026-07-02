@@ -2,6 +2,9 @@ import React from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
 import Image from "next/image";
+import CarMove from "@/components/CarMove";
+import LoadArt from "@/components/LoadArt";
+
 
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -21,12 +24,12 @@ const layout = ({ children }: { children: React.ReactNode }) => {
         <section className="auth-right-section">
           <div className="z-10 relative lg:mt-4 lg:mb-16 ">
             <blockquote className="auth-blockquote">
-              Signalist changed my life
+              One account, endless opportunities
             </blockquote>
             <div className="flex items-center justify-between">
               <div>
-                <cite className="auth-testimonial-author">Ethan R </cite>
-                <p className="max-md:text-xs text-gray-500">Retail Investor</p>
+                <cite className="auth-testimonial-author">Ethan  Rese</cite>
+                <p className="max-md:text-xs text-black">Retail Investor</p>
               </div>
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -43,13 +46,8 @@ const layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
           <div className="flex-1 relative">
-            <Image
-                src="/assets/images/dashboard.png"
-                alt="Dashboard Preview"
-                width={1440}
-                height={1150}
-                className="auth-dashboard-preview absolute top-0 "
-            />
+            <h1 className={"py-10 px-10 absolute text-orange text-3xl z-10"}>Access <br/> Your <br/> Account </h1>
+        <LoadArt/>
           </div>
         </section>
       </main>

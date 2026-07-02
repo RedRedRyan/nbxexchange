@@ -13,7 +13,7 @@ import { magic } from "@/lib/auth.magic";
 
 import {Button} from "@/components/ui/button";
 import SendModal from "@/components/SendModal";
-import {IdCard, Mail, Send, History} from "lucide-react";
+import {IdCard, Mail, Send, History, ArrowRightLeft, PiggyBank} from "lucide-react";
 import CopyAddressButton from "@/components/CopyAddressButton";
 import HistoryComponent from "@/components/HistoryComponent";
 
@@ -93,7 +93,7 @@ const Page = () => {
 
                         <p className=" font-bold"> QUICK ACTIONS</p>
                         <div className={"flex flex-row gap-2 mt-5"}>
-                            <div className={"flex flex-row items-center gap-3"}>
+                            <div className={"flex flex-col items-center gap-3"}>
                                 <Button
 
                                     onClick={() => setSendOpen(true)}
@@ -101,9 +101,35 @@ const Page = () => {
 
                                 >
                                     <Send className={""} width={20} height={20} />
-                                    <h1 className={'text-sm'}>send</h1>
-                                </Button>
 
+                                </Button>
+                                <h1 className={'text-sm'}>send</h1>
+
+                            </div>
+                            <div className={"flex flex-col items-center gap-3"}>
+                                <Button
+
+                                    onClick={() => setSendOpen(true)}
+                                    className={"qaction-btn"}
+
+                                >
+                                    <ArrowRightLeft className={""} width={20} height={20} />
+
+                                </Button>
+                                <h1 className={'text-sm'}>swap</h1>
+
+                            </div>
+                            <div className={"flex flex-col items-center gap-3"}>
+                                <Button
+
+                                    onClick={() => setSendOpen(true)}
+                                    className={"qaction-btn"}
+
+                                >
+                                    <PiggyBank className={""} width={20} height={20} />
+
+                                </Button>
+                                <h1 className={'text-sm'}>stake</h1>
 
                             </div>
 
